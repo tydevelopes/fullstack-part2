@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
@@ -17,31 +17,27 @@ const App = () => {
   const [showPersons, setShowPersons] = useState(persons);
 
   // onChange event handlers
-  const handleNameChange = event => {
-    setNewName(event.target.value);
-  };
-
-  const handleNumberChange = event => {
-    setNewNumber(event.target.value);
-  };
-
-  const handleSearchTermChange = event => {
-    setSearchTerm(event.target.value);
-    setPersonsToRender(event.target.value);
-  };
+  const handleNameChange = event => setNewName(event.target.value);
+  const handleNumberChange = event => setNewNumber(event.target.value);
+  const handleSearchTermChange = event =>
+    setPersonsToRender(event.target.value.trim());
 
   // Helper function
-  const setPersonsToRender = searchTerm => {
-    let showFilteredersons = null;
-    if (searchTerm.trim()) {
-      showFilteredersons = persons.filter(person =>
-        person.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
-      );
-    } else {
-      showFilteredersons = persons;
-    }
-    setShowPersons(showFilteredersons);
-  };
+  const setPersonsToRender = useCallback(
+    searchTerm => {
+      let showFilteredersons = null;
+      if (searchTerm) {
+        showFilteredersons = persons.filter(person =>
+          person.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+      } else {
+        showFilteredersons = persons;
+      }
+      setShowPersons(showFilteredersons);
+      setSearchTerm(searchTerm);
+    },
+    [persons]
+  );
 
   // onSubmit event handler
   const addPerson = event => {
@@ -70,6 +66,12 @@ const App = () => {
     setNewName('');
     setNewNumber('');
   };
+
+  // TODO: Fix the double rerender
+
+  useEffect(() => {
+    setPersonsToRender(searchTerm);
+  }, [searchTerm, setPersonsToRender]);
 
   return (
     <div>
