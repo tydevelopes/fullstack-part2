@@ -4,6 +4,7 @@ import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 
 const App = () => {
+  // App states
   const [persons, setPersons] = useState([
     { name: 'Arto Hellas', number: '040-123456' },
     { name: 'Ada Lovelace', number: '39-44-5323523' },
@@ -15,6 +16,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showPersons, setShowPersons] = useState(persons);
 
+  // onChange event handlers
   const handleNameChange = event => {
     setNewName(event.target.value);
   };
@@ -24,13 +26,12 @@ const App = () => {
   };
 
   const handleSearchTermChange = event => {
-    //console.log(event.target.value);
     setSearchTerm(event.target.value);
     setPersonsToRender(event.target.value);
   };
 
+  // Helper function
   const setPersonsToRender = searchTerm => {
-    //console.log(searchTerm);
     let showFilteredersons = null;
     if (searchTerm.trim()) {
       showFilteredersons = persons.filter(person =>
@@ -42,6 +43,7 @@ const App = () => {
     setShowPersons(showFilteredersons);
   };
 
+  // onSubmit event handler
   const addPerson = event => {
     event.preventDefault();
     //validation
@@ -91,9 +93,3 @@ const App = () => {
 };
 
 export default App;
-
-/*
-  add submit event to form
-  add onchange event to input
-  add new name to persons array when a name is submitted
-*/
