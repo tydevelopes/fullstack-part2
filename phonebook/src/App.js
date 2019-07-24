@@ -10,12 +10,9 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
-  const [showPersons, setShowPersons] = useState(persons);
 
   useEffect(() => {
     axios.get('http://localhost:3001/persons').then(response => {
-      console.log(response);
-      setShowPersons(response.data);
       setPersons(response.data);
     });
   }, []);
@@ -31,7 +28,6 @@ const App = () => {
 
   const handleSearchTermChange = event => {
     setSearchTerm(event.target.value);
-    setPersonsToRender(event.target.value);
   };
 
   // Helper function
@@ -44,7 +40,7 @@ const App = () => {
     } else {
       showFilteredPersons = persons;
     }
-    setShowPersons(showFilteredPersons);
+    return showFilteredPersons;
   };
 
   // onSubmit event handler
@@ -58,7 +54,6 @@ const App = () => {
     const isDuplicateName = persons.some(
       person => person.name === newName.trim()
     );
-
     const isDuplicateNumber = persons.some(
       person => person.number === newNumber.trim()
     );
@@ -69,14 +64,11 @@ const App = () => {
     } else {
       const newPerson = { name: newName, number: newNumber };
       setPersons([...persons, newPerson]);
-      setShowPersons([...persons, newPerson]);
     }
     setNewName('');
     setNewNumber('');
+    setSearchTerm('');
   };
-
-  console.log(persons.length, 'persons now');
-  console.log('rendered', showPersons.length, 'persons');
 
   return (
     <div>
@@ -94,7 +86,9 @@ const App = () => {
         newNumber={newNumber}
       />
       <h2>Numbers</h2>
-      <Persons showPersons={showPersons} />
+      <Persons
+        persons={searchTerm ? setPersonsToRender(searchTerm) : persons}
+      />
     </div>
   );
 };
