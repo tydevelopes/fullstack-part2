@@ -1,20 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
+import axios from 'axios';
 
 const App = () => {
   // App states
-  const [persons, setPersons] = useState([
-    { name: 'Arto Hellas', number: '040-123456' },
-    { name: 'Ada Lovelace', number: '39-44-5323523' },
-    { name: 'Dan Abramov', number: '12-43-234345' },
-    { name: 'Mary Poppendieck', number: '39-23-6423122' }
-  ]);
+  const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [showPersons, setShowPersons] = useState(persons);
+
+  useEffect(() => {
+    axios.get('http://localhost:3001/persons').then(response => {
+      console.log(response);
+      setShowPersons(response.data);
+      setPersons(response.data);
+    });
+  }, []);
 
   // onChange event handlers
   const handleNameChange = event => {
@@ -32,15 +36,15 @@ const App = () => {
 
   // Helper function
   const setPersonsToRender = searchTerm => {
-    let showFilteredersons = null;
+    let showFilteredPersons = null;
     if (searchTerm.trim()) {
-      showFilteredersons = persons.filter(person =>
+      showFilteredPersons = persons.filter(person =>
         person.name.toLowerCase().includes(searchTerm.trim().toLowerCase())
       );
     } else {
-      showFilteredersons = persons;
+      showFilteredPersons = persons;
     }
-    setShowPersons(showFilteredersons);
+    setShowPersons(showFilteredPersons);
   };
 
   // onSubmit event handler
@@ -70,6 +74,9 @@ const App = () => {
     setNewName('');
     setNewNumber('');
   };
+
+  console.log(persons.length, 'persons now');
+  console.log('rendered', showPersons.length, 'persons');
 
   return (
     <div>
