@@ -7,7 +7,14 @@ const App = () => {
   // App states
   const [countries, setCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [countriesFound, setCountriesFound] = useState([]);
+  const [showCountry, setShowCountry] = useState(false);
+  const [country, setCountry] = useState({});
+
+  // event handler
+  const handleShowCountry = newCountry => {
+    setShowCountry(true);
+    setCountry(newCountry);
+  };
 
   // Data fetching
   useEffect(() => {
@@ -19,6 +26,8 @@ const App = () => {
   // Event handlers
   const handleSearchTermChange = event => {
     setSearchTerm(event.target.value);
+    setShowCountry(false);
+    setCountry({});
   };
 
   // Find countries matching search term
@@ -32,13 +41,15 @@ const App = () => {
     return countriesFound;
   };
 
-  //console.log('rendered', countries.length, 'countries');
-  //console.log('found', searchCountries(searchTerm));
-
   return (
     <div>
       <Search onChange={handleSearchTermChange} />
-      <Countries countriesFound={searchCountries(searchTerm)} />
+      <Countries
+        countriesFound={searchCountries(searchTerm)}
+        handleShowCountry={handleShowCountry}
+        showCountry={showCountry}
+        country={country}
+      />
     </div>
   );
 };
