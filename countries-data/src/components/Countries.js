@@ -2,7 +2,39 @@ import React from 'react';
 
 const Countries = props => {
   // Show a country details
-  const renderCountry = ({ name, capital, population, languages, flag }) => {
+  const renderCountry = (country, weatherData) => {
+    let renderCapital,
+      renderTemp,
+      renderText,
+      renderIcon,
+      windSpeed,
+      windDirection;
+    const { name, capital, population, languages, flag } = country;
+    console.log(weatherData);
+    if (weatherData.hasOwnProperty('location')) {
+      const {
+        location: { name: countryCapital },
+        current: {
+          temp_f,
+          condition: { text, icon },
+          wind_mph,
+          wind_dir
+        }
+      } = weatherData;
+
+      console.log(countryCapital);
+      console.log(temp_f);
+      console.log(text);
+      console.log(icon);
+
+      renderCapital = countryCapital;
+      renderTemp = temp_f;
+      renderText = text;
+      renderIcon = icon;
+      windSpeed = wind_mph;
+      windDirection = wind_dir;
+    }
+
     return (
       <div>
         <h2>{name}</h2>
@@ -15,6 +47,19 @@ const Countries = props => {
           ))}
         </ul>
         <img src={flag} width="80px" alt="" />
+        <div>
+          <h4>Weather in {renderCapital}</h4>
+          <p>
+            <b>Temperature: </b>
+            {renderTemp} &deg;F
+          </p>
+          <div>{renderText}</div>
+          <img src={renderIcon} alt="" />
+          <div>
+            <b>Wind: </b>
+            {windSpeed} mph {windDirection}
+          </div>
+        </div>
       </div>
     );
   };
@@ -26,7 +71,7 @@ const Countries = props => {
   }
   if (numberOfCountriesFound > 1 && numberOfCountriesFound <= 10) {
     return props.showCountry ? (
-      renderCountry(props.country)
+      renderCountry(props.country, props.countryCapitalWeather)
     ) : (
       <div>
         {props.countriesFound.map(country => (
@@ -42,7 +87,8 @@ const Countries = props => {
   }
   if (numberOfCountriesFound === 1) {
     const [country] = props.countriesFound;
-    return renderCountry(country);
+    props.handleShowCountry(country);
+    return renderCountry(country, props.countryCapitalWeather);
   }
   return <div>Type a country in the search above to see its details</div>;
 };

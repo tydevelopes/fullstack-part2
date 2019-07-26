@@ -9,6 +9,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showCountry, setShowCountry] = useState(false);
   const [country, setCountry] = useState({});
+  const [countryCapitalWeather, setCountryCapitalWeather] = useState({});
 
   // event handler
   const handleShowCountry = newCountry => {
@@ -23,11 +24,24 @@ const App = () => {
       .then(response => setCountries(response.data));
   }, []);
 
+  // country's capital weather data fetching
+  useEffect(() => {
+    console.log('weather fetched for', country);
+    const API_KEY = '90d64a786bf047aa832165818192507';
+    if (country.capital !== undefined) {
+      const url = `https://api.apixu.com/v1/current.json?key=${API_KEY}&q=${
+        country.capital
+      }`;
+      axios.get(url).then(response => setCountryCapitalWeather(response.data));
+    }
+  }, [country]);
+
   // Event handlers
   const handleSearchTermChange = event => {
     setSearchTerm(event.target.value);
     setShowCountry(false);
     setCountry({});
+    setCountryCapitalWeather({});
   };
 
   // Find countries matching search term
@@ -49,6 +63,7 @@ const App = () => {
         handleShowCountry={handleShowCountry}
         showCountry={showCountry}
         country={country}
+        countryCapitalWeather={countryCapitalWeather}
       />
     </div>
   );
