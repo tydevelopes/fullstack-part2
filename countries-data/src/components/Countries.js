@@ -10,8 +10,8 @@ const Countries = props => {
       windSpeed,
       windDirection;
     const { name, capital, population, languages, flag } = country;
-    console.log(weatherData);
-    if (weatherData.hasOwnProperty('location')) {
+
+    if (weatherData) {
       const {
         location: { name: countryCapital },
         current: {
@@ -21,11 +21,6 @@ const Countries = props => {
           wind_dir
         }
       } = weatherData;
-
-      console.log(countryCapital);
-      console.log(temp_f);
-      console.log(text);
-      console.log(icon);
 
       renderCapital = countryCapital;
       renderTemp = temp_f;

@@ -8,27 +8,25 @@ const App = () => {
   const [countries, setCountries] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [showCountry, setShowCountry] = useState(false);
-  const [country, setCountry] = useState({});
-  const [countryCapitalWeather, setCountryCapitalWeather] = useState({});
+  const [country, setCountry] = useState(null);
+  const [countryCapitalWeather, setCountryCapitalWeather] = useState(null);
 
-  // event handler
-  const handleShowCountry = newCountry => {
-    setShowCountry(true);
-    setCountry(newCountry);
-  };
-
-  // Data fetching
+  // fetch countries data
   useEffect(() => {
+    console.log('1st useEffect');
+
     axios
       .get('https://restcountries.eu/rest/v2/all')
       .then(response => setCountries(response.data));
   }, []);
 
-  // country's capital weather data fetching
+  // fetch country's capital weather data
   useEffect(() => {
-    console.log('weather fetched for', country);
+    console.log('2nd useEffect');
+    console.log('country', country);
+
     const API_KEY = '90d64a786bf047aa832165818192507';
-    if (country.capital !== undefined) {
+    if (country) {
       const url = `https://api.apixu.com/v1/current.json?key=${API_KEY}&q=${
         country.capital
       }`;
@@ -40,8 +38,14 @@ const App = () => {
   const handleSearchTermChange = event => {
     setSearchTerm(event.target.value);
     setShowCountry(false);
-    setCountry({});
-    setCountryCapitalWeather({});
+    setCountry(null);
+    setCountryCapitalWeather(null);
+  };
+
+  // event handler
+  const handleShowCountry = newCountry => {
+    setShowCountry(true);
+    setCountry(newCountry);
   };
 
   // Find countries matching search term
