@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
-import axios from 'axios';
+import crud from './services/crud';
 
 const App = () => {
   // App states
@@ -12,9 +12,7 @@ const App = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    axios.get('http://localhost:3001/persons').then(response => {
-      setPersons(response.data);
-    });
+    crud.getAll().then(initialPersons => setPersons(initialPersons));
   }, []);
 
   // onChange event handlers
@@ -48,7 +46,7 @@ const App = () => {
     event.preventDefault();
     //validation
     if (!newName.trim() || !newNumber.trim()) {
-      alert('name and number fiels cannot be empty');
+      alert('name and number fields cannot be empty');
       return;
     }
     const isDuplicateName = persons.some(
@@ -58,16 +56,40 @@ const App = () => {
       person => person.number === newNumber.trim()
     );
     if (isDuplicateName) {
-      alert(`${newName} is already added to phonebook`);
+      const userResponse = window.confirm(
+        `${newName} is already added to phonebook, replace old number with new number?`
+      );
+      if (userResponse) {
+        const newPerson = { name: newName, number: newNumber };
+        const { id } = persons.find(person => person.name === newName);
+        crud.update(id, newPerson).then(returnedPerson => {
+          setPersons(
+            persons.map(person =>
+              person.name !== newName ? person : returnedPerson
+            )
+          );
+        });
+      }
     } else if (isDuplicateNumber) {
       alert(`${newNumber} is already added to phonebook`);
     } else {
       const newPerson = { name: newName, number: newNumber };
-      setPersons([...persons, newPerson]);
+      crud
+        .create(newPerson)
+        .then(returnedPerson => setPersons([...persons, returnedPerson]));
     }
     setNewName('');
     setNewNumber('');
     setSearchTerm('');
+  };
+
+  const handleDelete = ({ id, name }) => {
+    const userResponse = window.confirm(`Delete ${name}?`);
+    if (userResponse) {
+      crud.remove(id).then(status => {
+        setPersons(persons.filter(person => person.id !== id));
+      });
+    }
   };
 
   return (
@@ -88,6 +110,7 @@ const App = () => {
       <h2>Numbers</h2>
       <Persons
         persons={searchTerm ? setPersonsToRender(searchTerm) : persons}
+        handleDelete={handleDelete}
       />
     </div>
   );
