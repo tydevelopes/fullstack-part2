@@ -3,6 +3,7 @@ import Filter from './components/Filter';
 import PersonForm from './components/PersonForm';
 import Persons from './components/Persons';
 import crud from './services/crud';
+import Notification from './components/Notification';
 
 const App = () => {
   // App states
@@ -10,6 +11,7 @@ const App = () => {
   const [newName, setNewName] = useState('');
   const [newNumber, setNewNumber] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
+  const [message, setMessage] = useState(null);
 
   useEffect(() => {
     crud.getAll().then(initialPersons => setPersons(initialPersons));
@@ -62,21 +64,41 @@ const App = () => {
       if (userResponse) {
         const newPerson = { name: newName, number: newNumber };
         const { id } = persons.find(person => person.name === newName);
-        crud.update(id, newPerson).then(returnedPerson => {
-          setPersons(
-            persons.map(person =>
-              person.name !== newName ? person : returnedPerson
-            )
-          );
-        });
+        crud
+          .update(id, newPerson)
+          .then(returnedPerson => {
+            setPersons(
+              persons.map(person =>
+                person.name !== newName ? person : returnedPerson
+              )
+            );
+          })
+          .catch(error => {
+            console.log(error);
+
+            setMessage({
+              content: `Information of ${newName} has already been removed from the server`,
+              type: 'failure'
+            });
+            setTimeout(() => {
+              setMessage(null);
+            }, 3000);
+          });
       }
     } else if (isDuplicateNumber) {
       alert(`${newNumber} is already added to phonebook`);
     } else {
       const newPerson = { name: newName, number: newNumber };
-      crud
-        .create(newPerson)
-        .then(returnedPerson => setPersons([...persons, returnedPerson]));
+      crud.create(newPerson).then(returnedPerson => {
+        setMessage({
+          content: `Added ${returnedPerson.name}`,
+          type: 'success'
+        });
+        setPersons([...persons, returnedPerson]);
+        setTimeout(() => {
+          setMessage(null);
+        }, 3000);
+      });
     }
     setNewName('');
     setNewNumber('');
@@ -95,6 +117,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification message={message} />
       <Filter
         handleSearchTermChange={handleSearchTermChange}
         searchTerm={searchTerm}

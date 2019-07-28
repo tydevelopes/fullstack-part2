@@ -11,3 +11,16 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
+
+.success {
+  background-color: rgb(47, 49, 48);
+  padding: 15px;
+  border: 1px solid rgb(29, 243, 172);
+  color: rgb(0, 255, 170);
+}
+.failure {
+  background-color: rgb(47, 49, 48);
+  padding: 15px;
+  border: 1px solid rgb(245, 46, 46);
+  color: rgb(245, 46, 46);
+}
