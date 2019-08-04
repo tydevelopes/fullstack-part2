@@ -89,24 +89,30 @@ const App = () => {
       alert(`${newNumber} is already added to phonebook`);
     } else {
       const newPerson = { name: newName, number: newNumber };
-      crud.create(newPerson).then(returnedPerson => {
-        setMessage({
-          content: `Added ${returnedPerson.name}`,
-          type: 'success'
+      crud
+        .create(newPerson)
+        .then(returnedPerson => {
+          console.log('working:', returnedPerson);
+
+          setMessage({
+            content: `Added ${returnedPerson.name}`,
+            type: 'success'
+          });
+          setPersons([...persons, returnedPerson]);
+          setTimeout(() => {
+            setMessage(null);
+          }, 3000);
+        })
+        .catch(error => {
+          console.log(error.response.data);
+          setMessage({
+            content: error.response.data.error,
+            type: 'failure'
+          });
+          setTimeout(() => {
+            setMessage(null);
+          }, 3000);
         });
-        setPersons([...persons, returnedPerson]);
-        setTimeout(() => {
-          setMessage(null);
-        }, 3000);
-      }).catch(error => {
-        setMessage({
-          content: error.response.data,
-          type: 'failure'
-        });
-        setTimeout(() => {
-          setMessage(null);
-        }, 3000);
-      })
     }
     setNewName('');
     setNewNumber('');
